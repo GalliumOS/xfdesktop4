@@ -1,3 +1,9 @@
+xfdesktop4 (4.12.0-1ubuntu1-galliumos2) vivid; urgency=medium
+
+  * Changed default wall to /usr/share/xfce4/backdrops/galliumos-wall2.jpg
+
+ -- Hugh Greenberg <hugh@galiumos.org>  Mon, 8 Feb 2016 22:08:51 -0400
+
 xfdesktop4 (4.12.0-1ubuntu1-galliumos1) vivid; urgency=medium
 
   * Set default wallpaper to a galliumos wall

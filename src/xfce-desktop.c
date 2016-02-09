@@ -63,7 +63,6 @@
 #include <glib.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
-#include <gio/gio.h>
 
 #ifdef ENABLE_DESKTOP_ICONS
 #include "xfdesktop-icon-view.h"
@@ -119,8 +118,6 @@ struct _XfceDesktopPriv
     GtkWidget *icon_view;
     gdouble system_font_size;
 #endif
-
-    gchar *last_filename;
 };
 
 enum
@@ -362,94 +359,11 @@ create_bg_pixmap(GdkScreen *gscreen, gpointer user_data)
 }
 
 static void
-set_accountsservice_user_bg(const gchar *filename)
-{
-    GDBusProxy *proxy = NULL;
-    GDBusProxy *user = NULL;
-    GVariant *variant = NULL;
-    GError *error = NULL;
-    gchar *object_path = NULL;
-    const gchar *user_name = g_get_user_name();
-
-    proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
-                                          G_DBUS_PROXY_FLAGS_NONE,
-                                          NULL,
-                                          "org.freedesktop.Accounts",
-                                          "/org/freedesktop/Accounts",
-                                          "org.freedesktop.Accounts",
-                                          NULL,
-                                          &error);
-
-    if(!proxy) {
-        DBG("Failed to contact accounts service: %s", error->message);
-        g_error_free(error);
-        return;
-    }
-
-    variant = g_dbus_proxy_call_sync(proxy,
-                                     "FindUserByName",
-                                     g_variant_new("(s)", user_name),
-                                     G_DBUS_CALL_FLAGS_NONE,
-                                     -1,
-                                     NULL,
-                                     &error);
-
-    if(!variant) {
-        DBG("Could not contact accounts service to look up '%s': %s",
-            user_name, error->message);
-        g_error_free(error);
-        goto bail;
-    }
-
-    g_variant_get(variant, "(o)", &object_path);
-    user = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
-                                         G_DBUS_PROXY_FLAGS_NONE,
-                                         NULL,
-                                         "org.freedesktop.Accounts",
-                                         object_path,
-                                         "org.freedesktop.Accounts.User",
-                                         NULL,
-                                         &error);
-    g_free(object_path);
-
-    if(!user) {
-        DBG("Could not create proxy for user '%s': %s",
-            g_variant_get_string(variant, NULL), error->message);
-        g_error_free(error);
-        goto bail;
-    }
-    g_variant_unref(variant);
-
-    variant = g_dbus_proxy_call_sync(user,
-                                     "SetBackgroundFile",
-                                     g_variant_new("(s)", filename),
-                                     G_DBUS_CALL_FLAGS_NONE,
-                                     -1,
-                                     NULL,
-                                     &error);
-
-    if(!variant) {
-        DBG("Failed to set the background '%s': %s", filename, error->message);
-        g_error_free(error);
-        goto bail;
-    }
-
-bail:
-    if(user)
-        g_object_unref(user);
-    if(proxy)
-        g_object_unref(proxy);
-    if(variant)
-        g_variant_unref(variant);
-}
-
-static void
 backdrop_changed_cb(XfceBackdrop *backdrop, gpointer user_data)
 {
     XfceDesktop *desktop = XFCE_DESKTOP(user_data);
     GdkPixmap *pmap = desktop->priv->bg_pixmap;
     GdkScreen *gscreen = desktop->priv->gscreen;
-    gchar *new_filename = NULL;
     GdkRectangle rect;
     GdkRegion *clip_region = NULL;
     gint i, monitor = -1, current_workspace;
@@ -480,20 +394,6 @@ backdrop_changed_cb(XfceBackdrop *backdrop, gpointer user_data)
     }
     if(monitor == -1)
         return;
-    /* notify Accountsservice of the new bg (only for monitor0) */
-    if(monitor == 0)
-    {
-        if (xfce_desktop_get_current_workspace(desktop) == 0)
-        {
-            new_filename = g_strdup(xfce_backdrop_get_image_filename(backdrop));
-            if (g_strcmp0(desktop->priv->last_filename, new_filename) != 0)
-            {
-                desktop->priv->last_filename = g_strdup(new_filename);
-                set_accountsservice_user_bg(xfce_backdrop_get_image_filename(backdrop));
-            }
-            g_free(new_filename);
-        }
-    }
 
 #ifdef G_ENABLE_DEBUG
     monitor_name = gdk_screen_get_monitor_plug_name(gscreen, monitor);
@@ -827,8 +727,8 @@ screen_set_selection(XfceDesktop *desktop)
 {
     Window xwin;
     gint xscreen;
-    gchar selection_name[100], common_selection_name[32];
-    Atom selection_atom, common_selection_atom, manager_atom;
+    gchar selection_name[100];
+    Atom selection_atom, manager_atom;
     
     xwin = GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(desktop)));
     xscreen = gdk_screen_get_number(desktop->priv->gscreen);
@@ -837,9 +737,6 @@ screen_set_selection(XfceDesktop *desktop)
     selection_atom = XInternAtom(gdk_x11_get_default_xdisplay(), selection_name, False);
     manager_atom = XInternAtom(gdk_x11_get_default_xdisplay(), "MANAGER", False);
 
-    g_snprintf(common_selection_name, 32, "_NET_DESKTOP_MANAGER_S%d", xscreen);
-    common_selection_atom = XInternAtom(gdk_x11_get_default_xdisplay(), common_selection_name, False);
-
     /* the previous check in src/main.c occurs too early, so workaround by
      * adding this one. */
    if(XGetSelectionOwner(gdk_x11_get_default_xdisplay(), selection_atom) != None) {
@@ -847,16 +744,8 @@ screen_set_selection(XfceDesktop *desktop)
        exit(0);
    }
 
-    /* Check that _NET_DESKTOP_MANAGER_S%d isn't set, as it means another
-     * desktop manager is running, e.g. nautilus */
-    if(XGetSelectionOwner (gdk_x11_get_default_xdisplay(), common_selection_atom) != None) {
-        g_warning("%s: another desktop manager is running.", PACKAGE);
-        exit(1);
-    }
-
     XSelectInput(gdk_x11_get_default_xdisplay(), xwin, PropertyChangeMask | ButtonPressMask);
     XSetSelectionOwner(gdk_x11_get_default_xdisplay(), selection_atom, xwin, GDK_CURRENT_TIME);
-    XSetSelectionOwner(gdk_x11_get_default_xdisplay(), common_selection_atom, xwin, GDK_CURRENT_TIME);
 
     /* Check to see if we managed to claim the selection. If not,
      * we treat it as if we got it then immediately lost it */
@@ -1533,9 +1422,7 @@ xfce_desktop_new(GdkScreen *gscreen,
     desktop->priv->property_prefix = g_strdup(property_prefix);
 
     xfce_desktop_connect_settings(desktop);
-
-    desktop->priv->last_filename = g_strdup("");
-
+    
     return GTK_WIDGET(desktop);
 }
 
