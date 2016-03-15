@@ -114,6 +114,7 @@ struct _XfceDesktopPriv
     gboolean icons_font_size_set;
     guint icons_font_size;
     guint icons_size;
+    gboolean icons_center_text;
     gint  style_refresh_timer;
     GtkWidget *icon_view;
     gdouble system_font_size;
@@ -135,6 +136,7 @@ enum
     PROP_ICON_SIZE,
     PROP_ICON_FONT_SIZE,
     PROP_ICON_FONT_SIZE_SET,
+    PROP_ICON_CENTER_TEXT,
 #endif
     PROP_SINGLE_WORKSPACE_MODE,
     PROP_SINGLE_WORKSPACE_NUMBER,
@@ -261,10 +263,15 @@ xfce_desktop_setup_icon_view(XfceDesktop *desktop)
             xfdesktop_icon_view_set_icon_size(XFDESKTOP_ICON_VIEW(desktop->priv->icon_view),
                                               desktop->priv->icons_size);
         }
+        xfdesktop_icon_view_set_center_text (XFDESKTOP_ICON_VIEW(desktop->priv->icon_view),
+                                             desktop->priv->icons_center_text);
+
         gtk_widget_show(desktop->priv->icon_view);
         gtk_container_add(GTK_CONTAINER(desktop), desktop->priv->icon_view);
 
-        g_signal_connect(G_OBJECT(manager), "hidden-state-changed", G_CALLBACK(hidden_state_changed_cb), desktop);
+        if(desktop->priv->icons_style == XFCE_DESKTOP_ICON_STYLE_FILES)
+            g_signal_connect(G_OBJECT(manager), "hidden-state-changed",
+                             G_CALLBACK(hidden_state_changed_cb), desktop);
     }
     
     gtk_widget_queue_draw(GTK_WIDGET(desktop));
@@ -859,6 +866,13 @@ xfce_desktop_class_init(XfceDesktopClass *klass)
                                                          FALSE,
                                                          XFDESKTOP_PARAM_FLAGS));
 
+    g_object_class_install_property(gobject_class, PROP_ICON_CENTER_TEXT,
+                                    g_param_spec_boolean("icon-center-text",
+                                                         "icon center text",
+                                                         "icon center text",
+                                                         TRUE,
+                                                         XFDESKTOP_PARAM_FLAGS));
+
 #endif /* ENABLE_DESKTOP_ICONS */
 
     g_object_class_install_property(gobject_class, PROP_SINGLE_WORKSPACE_MODE,
@@ -939,6 +953,11 @@ xfce_desktop_set_property(GObject *object,
                                                 g_value_get_boolean(value));
             break;
 
+        case PROP_ICON_CENTER_TEXT:
+            xfce_desktop_set_center_text(desktop,
+                                         g_value_get_boolean(value));
+            break;
+
 #endif
         case PROP_SINGLE_WORKSPACE_MODE:
             xfce_desktop_set_single_workspace_mode(desktop,
@@ -980,6 +999,10 @@ xfce_desktop_get_property(GObject *object,
 
         case PROP_ICON_FONT_SIZE_SET:
             g_value_set_boolean(value, desktop->priv->icons_font_size_set);
+            break;
+
+        case PROP_ICON_CENTER_TEXT:
+            g_value_set_boolean(value, desktop->priv->icons_center_text);
             break;
 
 #endif
@@ -1343,6 +1366,9 @@ xfce_desktop_connect_settings(XfceDesktop *desktop)
     xfconf_g_property_bind(channel, ICONS_PREFIX "use-custom-font-size",
                            G_TYPE_BOOLEAN,
                            G_OBJECT(desktop), "icon-font-size-set");
+    xfconf_g_property_bind(channel, ICONS_PREFIX "center-text",
+                           G_TYPE_BOOLEAN,
+                           G_OBJECT(desktop), "icon-center-text");
 
     xfce_desktop_thaw_updates(desktop);
 #undef ICONS_PREFIX
@@ -1587,6 +1613,23 @@ xfce_desktop_set_use_icon_font_size(XfceDesktop *desktop,
 #endif
 }
 
+void
+xfce_desktop_set_center_text (XfceDesktop *desktop,
+                              gboolean center_text)
+{
+    g_return_if_fail(XFCE_IS_DESKTOP(desktop));
+    
+#ifdef ENABLE_DESKTOP_ICONS
+    if(center_text == desktop->priv->icons_center_text)
+        return;
+
+    desktop->priv->icons_center_text = center_text;
+    if(desktop->priv->icon_view) {
+        xfdesktop_icon_view_set_center_text (XFDESKTOP_ICON_VIEW(desktop->priv->icon_view), center_text);
+    }
+#endif
+}
+
 static void
 xfce_desktop_set_single_workspace_mode(XfceDesktop *desktop,
                                        gboolean single_workspace)
@@ -1761,6 +1804,8 @@ xfce_desktop_refresh(XfceDesktop *desktop, gboolean advance_wallpaper)
             /* We need to trigger a new wallpaper event */
             xfce_backdrop_force_cycle(backdrop);
         } else {
+            /* Reinitialize wallpaper */
+            xfce_backdrop_clear_cached_image(backdrop);
             /* Fake a changed event so we redraw the wallpaper */
             backdrop_changed_cb(backdrop, desktop);
         }

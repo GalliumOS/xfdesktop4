@@ -9,7 +9,7 @@ Description: Get/set _NET_DESKTOP_MANAGER_S<screen> atom
  and decide whether to disable or forward it at that time.
 Author: Lionel Le Folgoc <mrpouit@ubuntu.com>
 Forwarded: not-needed
-Last-Update: 2012-04-17
+Last-Update: 2015-05-13
 
 ---
  src/xfce-desktop.c |   15 +++++++++++++--
@@ -17,7 +17,7 @@ Last-Update: 2012-04-17
 
 --- a/src/xfce-desktop.c
 +++ b/src/xfce-desktop.c
-@@ -827,8 +827,8 @@ screen_set_selection(XfceDesktop *deskto
+@@ -834,8 +834,8 @@
  {
      Window xwin;
      gint xscreen;
@@ -28,7 +28,7 @@ Last-Update: 2012-04-17
      
      xwin = GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(desktop)));
      xscreen = gdk_screen_get_number(desktop->priv->gscreen);
-@@ -837,6 +837,9 @@ screen_set_selection(XfceDesktop *deskto
+@@ -844,6 +844,9 @@
      selection_atom = XInternAtom(gdk_x11_get_default_xdisplay(), selection_name, False);
      manager_atom = XInternAtom(gdk_x11_get_default_xdisplay(), "MANAGER", False);
  
@@ -38,7 +38,7 @@ Last-Update: 2012-04-17
      /* the previous check in src/main.c occurs too early, so workaround by
       * adding this one. */
     if(XGetSelectionOwner(gdk_x11_get_default_xdisplay(), selection_atom) != None) {
-@@ -844,8 +847,16 @@ screen_set_selection(XfceDesktop *deskto
+@@ -851,8 +854,16 @@
         exit(0);
     }
  

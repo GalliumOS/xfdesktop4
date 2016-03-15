@@ -54,9 +54,6 @@
 /* Define if libnotify >= 0.4.0 present */
 #undef HAVE_LIBNOTIFY
 
-/* Define if libSM is available */
-#undef HAVE_LIBSM
-
 /* Define if libX11 is available */
 #undef HAVE_LIBX11
 

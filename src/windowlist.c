@@ -126,7 +126,7 @@ static void
 mi_destroyed_cb(GtkWidget *object, gpointer user_data)
 {
     g_object_weak_unref(G_OBJECT(user_data),
-            (GWeakNotify)window_destroyed_cb, object);
+                        (GWeakNotify)window_destroyed_cb, object);
 }
 
 static void
@@ -141,10 +141,10 @@ menulist_set_label_flags(GtkWidget *widget, gpointer data)
         gtk_label_set_ellipsize(label, PANGO_ELLIPSIZE_MIDDLE);
         gtk_label_set_max_width_chars(label, 24);
         *done = TRUE;
-    }
-    else if(GTK_IS_CONTAINER (widget))
+    } else if(GTK_IS_CONTAINER (widget)) {
         gtk_container_forall(GTK_CONTAINER (widget), menulist_set_label_flags,
-                              &done);
+                             &done);
+    }
 }
 
 static GtkWidget *
@@ -154,7 +154,7 @@ menu_item_from_wnck_window(WnckWindow *wnck_window, gint icon_width,
     GtkWidget *mi, *img = NULL;
     gchar *title;
     GString *label;
-    GdkPixbuf *icon, *tmp;
+    GdkPixbuf *icon, *tmp = NULL;
     gint w, h;
     gboolean truncated = FALSE;
 
@@ -170,19 +170,29 @@ menu_item_from_wnck_window(WnckWindow *wnck_window, gint icon_width,
         g_string_append(label, "</i></b>");
     }
 
+    /* add some padding to the right */
+    if(gtk_widget_get_default_direction() == GTK_TEXT_DIR_RTL)
+        g_string_prepend(label, "  ");
+    else
+        g_string_append(label, "  ");
+
     if(wl_show_icons) {
-        icon = wnck_window_get_icon(wnck_window);
+        icon = wnck_window_get_mini_icon(wnck_window);
         w = gdk_pixbuf_get_width(icon);
         h = gdk_pixbuf_get_height(icon);
         if(w != icon_width || h != icon_height) {
             tmp = gdk_pixbuf_scale_simple(icon, icon_width, icon_height,
-                    GDK_INTERP_BILINEAR);
+                                          GDK_INTERP_BILINEAR);
+        }
 
-            if(wnck_window_is_minimized(wnck_window)) {
-                /* minimized window, fade out app icon */
-                gdk_pixbuf_saturate_and_pixelate(tmp, tmp, 0.55, TRUE);
-            }
+        if(wnck_window_is_minimized(wnck_window)) {
+            if(!tmp)
+                tmp = gdk_pixbuf_copy(icon);
+            /* minimized window, fade out app icon */
+            gdk_pixbuf_saturate_and_pixelate(tmp, tmp, 0.55, TRUE);
+        }
 
+        if(tmp) {
             img = gtk_image_new_from_pixbuf(tmp);
             g_object_unref(G_OBJECT(tmp));
         } else
@@ -280,8 +290,7 @@ windowlist_populate(XfceDesktop *desktop,
             /* center the workspace header */
             gtk_misc_set_alignment(GTK_MISC(label), 0.44f, 0);
             /* If it's not the active workspace, make the color insensitive */
-            if(wnck_workspace != active_workspace)
-            {
+            if(wnck_workspace != active_workspace) {
                 GtkWidget *lbl = gtk_bin_get_child(GTK_BIN(mi));
                 gtk_widget_modify_fg(lbl, GTK_STATE_NORMAL,
                                      &(style->fg[GTK_STATE_INSENSITIVE]));
@@ -306,11 +315,10 @@ windowlist_populate(XfceDesktop *desktop,
             wnck_window = l->data;
             
             if((wnck_window_get_workspace(wnck_window) != wnck_workspace
-                        && (!wnck_window_is_sticky(wnck_window)
-                            || (wl_sticky_once
-                                && wnck_workspace != active_workspace)))
-                    || wnck_window_is_skip_pager(wnck_window)
-                    || wnck_window_is_skip_tasklist(wnck_window))
+                && (!wnck_window_is_sticky(wnck_window)
+                    || (wl_sticky_once && wnck_workspace != active_workspace)))
+                || wnck_window_is_skip_pager(wnck_window)
+                || wnck_window_is_skip_tasklist(wnck_window))
             {
                 /* the window isn't on the current WS AND isn't sticky,
                  * OR,
@@ -326,21 +334,22 @@ windowlist_populate(XfceDesktop *desktop,
                 continue;
 
             if(wnck_workspace != active_workspace
-               && (!wnck_window_is_sticky(wnck_window) || wnck_workspace != active_workspace))
+               && (!wnck_window_is_sticky(wnck_window)
+                   || wnck_workspace != active_workspace))
             {
                 GtkWidget *lbl = gtk_bin_get_child(GTK_BIN(mi));
                 gtk_widget_modify_fg(lbl, GTK_STATE_NORMAL,
-                        &(style->fg[GTK_STATE_INSENSITIVE]));
+                                     &(style->fg[GTK_STATE_INSENSITIVE]));
             }
 
             gtk_widget_show(mi);
             gtk_menu_shell_append(GTK_MENU_SHELL(submenu), mi);
             g_object_weak_ref(G_OBJECT(wnck_window),
-                    (GWeakNotify)window_destroyed_cb, mi);
+                              (GWeakNotify)window_destroyed_cb, mi);
             g_signal_connect(G_OBJECT(mi), "activate",
-                    G_CALLBACK(activate_window), wnck_window);
+                             G_CALLBACK(activate_window), wnck_window);
             g_signal_connect(G_OBJECT(mi), "destroy",
-                    G_CALLBACK(mi_destroyed_cb), wnck_window);
+                             G_CALLBACK(mi_destroyed_cb), wnck_window);
         }
         
         if(!wl_submenus && (i < nworkspaces-1 || wl_add_remove_options)) {
@@ -361,7 +370,7 @@ windowlist_populate(XfceDesktop *desktop,
         gtk_widget_show(mi);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), mi);
         g_signal_connect(G_OBJECT(mi), "activate",
-                G_CALLBACK(set_num_workspaces), GINT_TO_POINTER(nworkspaces+1));
+                         G_CALLBACK(set_num_workspaces), GINT_TO_POINTER(nworkspaces+1));
     
         /* 'remove workspace' item */
         if(!ws_name || atoi(ws_name) == nworkspaces)
@@ -383,7 +392,8 @@ windowlist_populate(XfceDesktop *desktop,
         gtk_widget_show(mi);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), mi);
         g_signal_connect(G_OBJECT(mi), "activate",
-                G_CALLBACK(set_num_workspaces), GINT_TO_POINTER(nworkspaces-1));
+                         G_CALLBACK(set_num_workspaces),
+                         GINT_TO_POINTER(nworkspaces-1));
     }
 }
 

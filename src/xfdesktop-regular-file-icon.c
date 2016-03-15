@@ -54,8 +54,9 @@
 #include "xfdesktop-common.h"
 #include "xfdesktop-regular-file-icon.h"
 
-#define EMBLEM_SYMLINK  "emblem-symbolic-link"
-#define EMBLEM_READONLY "emblem-readonly"
+#define EMBLEM_UNREADABLE "emblem-unreadable"
+#define EMBLEM_READONLY   "emblem-readonly"
+#define EMBLEM_SYMLINK    "emblem-symbolic-link"
 
 struct _XfdesktopRegularFileIconPrivate
 {
@@ -505,9 +506,21 @@ xfdesktop_regular_file_icon_load_icon(XfdesktopIcon *icon)
     /* Add any user set emblems */
     gicon = xfdesktop_file_icon_add_emblems(file_icon);
 
-    /* load the read only emblem if necessary */
+    /* load the unreadable emblem if necessary */
     if(!g_file_info_get_attribute_boolean(regular_icon->priv->file_info,
-                                          G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+                                          G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
+    {
+        GIcon *themed_icon = g_themed_icon_new(EMBLEM_UNREADABLE);
+        GEmblem *emblem = g_emblem_new(themed_icon);
+
+        g_emblemed_icon_add_emblem(G_EMBLEMED_ICON(gicon), emblem);
+
+        g_object_unref(emblem);
+        g_object_unref(themed_icon);
+    }
+    /* load the read only emblem if necessary */
+    else if(!g_file_info_get_attribute_boolean(regular_icon->priv->file_info,
+                                               G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
     {
         GIcon *themed_icon = g_themed_icon_new(EMBLEM_READONLY);
         GEmblem *emblem = g_emblem_new(themed_icon);
@@ -649,7 +662,7 @@ xfdesktop_regular_file_icon_get_allowed_drop_actions(XfdesktopIcon *icon,
         if(g_file_info_get_attribute_boolean(info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE)) {
             if(suggested_action)
                 *suggested_action = GDK_ACTION_MOVE;
-            return GDK_ACTION_MOVE | GDK_ACTION_COPY | GDK_ACTION_LINK;
+            return GDK_ACTION_MOVE | GDK_ACTION_COPY | GDK_ACTION_LINK | GDK_ACTION_ASK;
         }
     } else {
         if(xfdesktop_file_utils_file_is_executable(info)) {
@@ -798,7 +811,7 @@ xfdesktop_regular_file_icon_peek_tooltip(XfdesktopIcon *icon)
                 comment = xfce_rc_read_entry(rcfile, "Comment", NULL);
             }
             /* Prepend the comment to the tooltip */
-            if(comment != NULL) {
+            if(comment != NULL && *comment != '\0') {
                 gchar *tooltip = regular_file_icon->priv->tooltip;
                 regular_file_icon->priv->tooltip = g_strdup_printf("%s\n%s",
                                                                    comment,

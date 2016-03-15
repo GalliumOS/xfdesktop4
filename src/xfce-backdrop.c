@@ -26,6 +26,10 @@
 #include <config.h>
 #endif
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
@@ -87,6 +91,12 @@ static void xfce_backdrop_image_data_release(XfceBackdropImageData *image_data);
 gchar *xfce_backdrop_choose_next         (XfceBackdrop *backdrop);
 gchar *xfce_backdrop_choose_random       (XfceBackdrop *backdrop);
 gchar *xfce_backdrop_choose_chronological(XfceBackdrop *backdrop);
+
+static void cb_xfce_backdrop_image_files_changed(GFileMonitor     *monitor,
+                                                 GFile            *file,
+                                                 GFile            *other_file,
+                                                 GFileMonitorEvent event,
+                                                 gpointer          user_data);
 
 struct _XfceBackdropPriv
 {
@@ -232,7 +242,7 @@ create_gradient(GdkColor *color1, GdkColor *color2, gint width, gint height,
     return pix;
 }
 
-static void
+void
 xfce_backdrop_clear_cached_image(XfceBackdrop *backdrop)
 {
     g_return_if_fail(XFCE_IS_BACKDROP(backdrop));
@@ -244,10 +254,25 @@ xfce_backdrop_clear_cached_image(XfceBackdrop *backdrop)
     backdrop->priv->pix = NULL;
 }
 
+static void
+xfdesktop_backdrop_clear_directory_monitor(XfceBackdrop *backdrop)
+{
+    g_return_if_fail(XFCE_IS_BACKDROP(backdrop));
+
+    if(backdrop->priv->monitor) {
+            g_signal_handlers_disconnect_by_func(G_OBJECT(backdrop->priv->monitor),
+                                                 G_CALLBACK(cb_xfce_backdrop_image_files_changed),
+                                                 backdrop);
+
+            g_object_unref(backdrop->priv->monitor);
+            backdrop->priv->monitor = NULL;
+        }
+}
+
 /* we compare by the collate key so the image listing is the same as how
  * xfdesktop-settings displays the images */
 static gint
-compare_by_collate_key(const gchar *a, const gchar *b)
+glist_compare_by_collate_key(const gchar *a, const gchar *b)
 {
     gint ret;
     gchar *a_key = g_utf8_collate_key_for_filename(a, -1);
@@ -261,12 +286,26 @@ compare_by_collate_key(const gchar *a, const gchar *b)
     return ret;
 }
 
+typedef struct
+{
+    gchar *key;
+    gchar *string;
+} KeyStringPair;
+
+static int
+qsort_compare_pair_by_key(const void *a, const void *b)
+{
+    const gchar *a_key = ((const KeyStringPair *)a)->key;
+    const gchar *b_key = ((const KeyStringPair *)b)->key;
+    return g_strcmp0(a_key, b_key);
+}
+
 static void
-cb_xfce_backdrop__image_files_changed(GFileMonitor     *monitor,
-                                      GFile            *file,
-                                      GFile            *other_file,
-                                      GFileMonitorEvent event,
-                                      gpointer          user_data)
+cb_xfce_backdrop_image_files_changed(GFileMonitor     *monitor,
+                                     GFile            *file,
+                                     GFile            *other_file,
+                                     GFileMonitorEvent event,
+                                     gpointer          user_data)
 {
     XfceBackdrop *backdrop = XFCE_BACKDROP(user_data);
     gchar *changed_file = NULL;
@@ -274,7 +313,14 @@ cb_xfce_backdrop__image_files_changed(GFileMonitor     *monitor,
 
     switch(event) {
         case G_FILE_MONITOR_EVENT_CREATED:
+            if(!xfce_backdrop_get_cycle_backdrop(backdrop)) {
+                /* If we're not cycling, do nothing, it's faster :) */
+                break;
+            }
+
             changed_file = g_file_get_path(file);
+
+            XF_DEBUG("file added: %s", changed_file);
 
             /* Make sure we don't already have the new file in the list */
             if(g_list_find(backdrop->priv->image_files, changed_file)) {
@@ -289,15 +335,28 @@ cb_xfce_backdrop__image_files_changed(GFileMonitor     *monitor,
                 return;
             }
 
-            /* It is an image file and we don't have it in our list, add it
-             * sorted to our list, don't free changed file, that will happen
-             * when it is removed */
-            backdrop->priv->image_files = g_list_insert_sorted(backdrop->priv->image_files,
-                                                               changed_file,
-                                                               (GCompareFunc)compare_by_collate_key);
+            if(!xfce_backdrop_get_random_order(backdrop)) {
+                /* It is an image file and we don't have it in our list, add
+                 * it sorted to our list, don't free changed file, that will
+                 * happen when it is removed */
+                backdrop->priv->image_files = g_list_insert_sorted(backdrop->priv->image_files,
+                                                                   changed_file,
+                                                                   (GCompareFunc)glist_compare_by_collate_key);
+            } else {
+                /* Same as above except we don't care about the list's order
+                 * so just add it */
+                backdrop->priv->image_files = g_list_prepend(backdrop->priv->image_files, changed_file);
+            }
             break;
         case G_FILE_MONITOR_EVENT_DELETED:
+            if(!xfce_backdrop_get_cycle_backdrop(backdrop)) {
+                /* If we're not cycling, do nothing, it's faster :) */
+                break;
+            }
+
             changed_file = g_file_get_path(file);
+
+            XF_DEBUG("file deleted: %s", changed_file);
 
             /* find the file in the list */
             item = g_list_find_custom(backdrop->priv->image_files,
@@ -310,19 +369,115 @@ cb_xfce_backdrop__image_files_changed(GFileMonitor     *monitor,
 
             g_free(changed_file);
             break;
+        case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+            changed_file = g_file_get_path(file);
+
+            XF_DEBUG("file changed: %s", changed_file);
+            XF_DEBUG("image_path: %s", backdrop->priv->image_path);
+
+            if(g_strcmp0(changed_file, backdrop->priv->image_path) == 0) {
+                DBG("match");
+                /* clear the outdated backdrop */
+                xfce_backdrop_clear_cached_image(backdrop);
+
+                /* backdrop changed! */
+                g_signal_emit(G_OBJECT(backdrop), backdrop_signals[BACKDROP_CHANGED], 0);
+            }
+
+            g_free(changed_file);
+            break;
         default:
             break;
     }
 }
 
+/* Equivalent to (except for not being a stable sort), but faster than
+ * g_list_sort(list, (GCompareFunc)glist_compare_by_collate_key) */
+static GList *
+sort_image_list(GList *list, guint list_size)
+{
+    KeyStringPair *array;
+    guint i;
+    GList *l;
+
+    TRACE("entering");
+
+    g_assert(g_list_length(list) == list_size);
+
+#define TEST_IMAGE_SORTING 0
+
+#if TEST_IMAGE_SORTING
+    GList *list2 = g_list_copy(list);
+#endif
+
+    /* Allocate an array of the same size as list */
+    array = g_malloc(list_size * sizeof(array[0]));
+
+    /* Copy list contents to the array and generate collation keys */
+    for(l = list, i = 0; l; l = l->next, ++i) {
+        array[i].string = l->data;
+        array[i].key = g_utf8_collate_key_for_filename(array[i].string, -1);
+    }
+
+    /* Sort the array */
+    qsort(array, list_size, sizeof(array[0]), qsort_compare_pair_by_key);
+
+    /* Copy sorted array back to the list and deallocate the collation keys */
+    for(l = list, i = 0; l; l = l->next, ++i) {
+        l->data = array[i].string;
+        g_free(array[i].key);
+    }
+
+    g_free(array);
+
+#if TEST_IMAGE_SORTING
+    list2 = g_list_sort(list2, (GCompareFunc)glist_compare_by_collate_key);
+    if(g_list_length(list) != g_list_length(list2)) {
+        printf("Image sorting test FAILED: list size is not correct.");
+    } else {
+        GList *l2;
+        gboolean data_matches = TRUE, pointers_match = TRUE;
+        for(l = list, l2 = list2; l; l = l->next, l2 = l2->next) {
+            if(g_strcmp0(l->data, l2->data) != 0)
+                data_matches = FALSE;
+            if(l->data != l2->data)
+                pointers_match = FALSE;
+        }
+        if(data_matches) {
+            printf("Image sorting test SUCCEEDED: ");
+            if(pointers_match) {
+                printf("both data and pointers are correct.");
+            } else {
+                printf("data matches but pointers do not match. "
+                        "This is caused by unstable sorting.");
+            }
+        }
+        else {
+            printf("Image sorting test FAILED: ");
+            if(pointers_match) {
+                printf("data does not match but pointers do match. "
+                        "Something went really wrong!");
+            }
+            else {
+                printf("neither data nor pointers match.");
+            }
+        }
+    }
+    putchar('\n');
+#endif
+
+    return list;
+}
+
 /* Returns a GList of all the image files in the parent directory of filename */
 static GList *
-list_image_files_in_dir(const gchar *filename)
+list_image_files_in_dir(XfceBackdrop *backdrop, const gchar *filename)
 {
     GDir *dir;
     gboolean needs_slash = TRUE;
     const gchar *file;
     GList *files = NULL;
+    guint file_count = 0;
     gchar *dir_name;
 
     dir_name = g_path_get_dirname(filename);
@@ -339,14 +494,21 @@ list_image_files_in_dir(const gchar *filename)
     while((file = g_dir_read_name(dir))) {
         gchar *current_file = g_strdup_printf(needs_slash ? "%s/%s" : "%s%s",
                                               dir_name, file);
-        if(xfdesktop_image_file_is_valid(current_file))
-            files = g_list_insert_sorted(files, current_file, (GCompareFunc)compare_by_collate_key);
-        else
+        if(xfdesktop_image_file_is_valid(current_file)) {
+            files = g_list_prepend(files, current_file);
+            ++file_count;
+        } else
             g_free(current_file);
     }
 
     g_dir_close(dir);
     g_free(dir_name);
+
+    /* Only sort if there's more than 1 item and we're not randomly picking
+     * images from the list */
+    if(file_count > 1 && !xfce_backdrop_get_random_order(backdrop)) {
+        files = sort_image_list(files, file_count);
+    }
 
     return files;
 }
@@ -354,26 +516,28 @@ list_image_files_in_dir(const gchar *filename)
 static void
 xfce_backdrop_load_image_files(XfceBackdrop *backdrop)
 {
-    /* generate the image_files list if it doesn't exist and monitor that
-     * directory so we can update the list */
-    if(backdrop->priv->image_files == NULL && backdrop->priv->image_path) {
+    TRACE("entering");
+
+    /* generate the image_files list if it doesn't exist and we're cycling
+     * backdrops */
+    if(backdrop->priv->image_files == NULL &&
+       backdrop->priv->image_path &&
+       xfce_backdrop_get_cycle_backdrop(backdrop)) {
+        backdrop->priv->image_files = list_image_files_in_dir(backdrop, backdrop->priv->image_path);
+
+        xfdesktop_backdrop_clear_directory_monitor(backdrop);
+    }
+
+    /* Always monitor the directory even if we aren't cycling so we know if
+     * our current wallpaper has changed by an external program/script */
+    if(backdrop->priv->image_path && !backdrop->priv->monitor) {
         gchar *dir_name = g_path_get_dirname(backdrop->priv->image_path);
         GFile *gfile = g_file_new_for_path(dir_name);
 
-        backdrop->priv->image_files = list_image_files_in_dir(backdrop->priv->image_path);
-
-        if(backdrop->priv->monitor) {
-            g_signal_handlers_disconnect_by_func(G_OBJECT(backdrop->priv->monitor),
-                                                 G_CALLBACK(cb_xfce_backdrop__image_files_changed),
-                                                 backdrop);
-
-            g_object_unref(backdrop->priv->monitor);
-        }
-
-        /* monitor the new directory for changes */
+        /* monitor the directory for changes */
         backdrop->priv->monitor = g_file_monitor(gfile, G_FILE_MONITOR_NONE, NULL, NULL);
         g_signal_connect(backdrop->priv->monitor, "changed",
-                         G_CALLBACK(cb_xfce_backdrop__image_files_changed),
+                         G_CALLBACK(cb_xfce_backdrop_image_files_changed),
                          backdrop);
 
         g_free(dir_name);
@@ -394,9 +558,6 @@ xfce_backdrop_choose_next(XfceBackdrop *backdrop)
     g_return_val_if_fail(XFCE_IS_BACKDROP(backdrop), NULL);
 
     filename = backdrop->priv->image_path;
-
-    if(backdrop->priv->image_files == NULL)
-        xfce_backdrop_load_image_files(backdrop);
 
     if(!backdrop->priv->image_files)
         return NULL;
@@ -431,8 +592,6 @@ xfce_backdrop_choose_random(XfceBackdrop *backdrop)
     TRACE("entering");
 
     g_return_val_if_fail(XFCE_IS_BACKDROP(backdrop), NULL);
-
-    xfce_backdrop_load_image_files(backdrop);
 
     if(!backdrop->priv->image_files)
         return NULL;
@@ -469,8 +628,6 @@ xfce_backdrop_choose_chronological(XfceBackdrop *backdrop)
     TRACE("entering");
 
     g_return_val_if_fail(XFCE_IS_BACKDROP(backdrop), NULL);
-
-    xfce_backdrop_load_image_files(backdrop);
 
     if(!backdrop->priv->image_files)
         return NULL;
@@ -641,14 +798,7 @@ xfce_backdrop_finalize(GObject *object)
 
     xfce_backdrop_clear_cached_image(backdrop);
 
-    if(backdrop->priv->monitor) {
-        g_signal_handlers_disconnect_by_func(G_OBJECT(backdrop->priv->monitor),
-                                             G_CALLBACK(cb_xfce_backdrop__image_files_changed),
-                                             backdrop);
-
-        g_object_unref(backdrop->priv->monitor);
-        backdrop->priv->monitor = NULL;
-    }
+    xfdesktop_backdrop_clear_directory_monitor(backdrop);
 
     /* Free the image files list */
     if(backdrop->priv->image_files) {
@@ -1002,26 +1152,22 @@ xfce_backdrop_set_image_filename(XfceBackdrop *backdrop, const gchar *filename)
         return;
 
     /* We need to free the image_files if image_path changed directories */
-    if(backdrop->priv->image_files) {
+    if(backdrop->priv->image_files || backdrop->priv->monitor) {
         if(backdrop->priv->image_path)
             old_dir = g_path_get_dirname(backdrop->priv->image_path);
         if(filename)
             new_dir = g_path_get_dirname(filename);
 
-        /* Directories did change, free list */
+        /* Directories did change */
         if(g_strcmp0(old_dir, new_dir) != 0) {
-            g_list_free_full(backdrop->priv->image_files, g_free);
-            backdrop->priv->image_files = NULL;
+            /* Free the image list if we had one */
+            if(backdrop->priv->image_files) {
+                g_list_free_full(backdrop->priv->image_files, g_free);
+                backdrop->priv->image_files = NULL;
+            }
 
             /* release the directory monitor */
-            if(backdrop->priv->monitor) {
-                g_signal_handlers_disconnect_by_func(G_OBJECT(backdrop->priv->monitor),
-                                                     G_CALLBACK(cb_xfce_backdrop__image_files_changed),
-                                                     backdrop);
-
-                g_object_unref(backdrop->priv->monitor);
-                backdrop->priv->monitor = NULL;
-            }
+            xfdesktop_backdrop_clear_directory_monitor(backdrop);
         }
 
         g_free(old_dir);
@@ -1037,6 +1183,8 @@ xfce_backdrop_set_image_filename(XfceBackdrop *backdrop, const gchar *filename)
         backdrop->priv->image_path = NULL;
 
     xfce_backdrop_clear_cached_image(backdrop);
+
+    xfce_backdrop_load_image_files(backdrop);
 
     g_signal_emit(G_OBJECT(backdrop), backdrop_signals[BACKDROP_CHANGED], 0);
 }
@@ -1278,12 +1426,17 @@ xfce_backdrop_set_cycle_backdrop(XfceBackdrop *backdrop,
         /* Start or stop the backdrop changing */
         xfce_backdrop_set_cycle_timer(backdrop,
                                       xfce_backdrop_get_cycle_timer(backdrop));
-    }
 
-    /* If we're not cycling anymore, free the image files list */
-    if(!backdrop->priv->cycle_backdrop && backdrop->priv->image_files) {
-        g_list_free_full(backdrop->priv->image_files, g_free);
-        backdrop->priv->image_files = NULL;
+        if(cycle_backdrop) {
+            /* We're cycling now, so load up an image list */
+            xfce_backdrop_load_image_files(backdrop);
+        }
+        else if(backdrop->priv->image_files)
+        {
+            /* we're not cycling anymore, free the image files list */
+            g_list_free_full(backdrop->priv->image_files, g_free);
+            backdrop->priv->image_files = NULL;
+        }
     }
 }
 
@@ -1347,7 +1500,17 @@ xfce_backdrop_set_random_order(XfceBackdrop *backdrop,
 
     TRACE("entering");
 
-    backdrop->priv->random_backdrop_order = random_order;
+    if(backdrop->priv->random_backdrop_order != random_order) {
+        backdrop->priv->random_backdrop_order = random_order;
+
+        /* If we have an image list and care about order now, sort the list */
+        if(!random_order && backdrop->priv->image_files) {
+            guint num_items = g_list_length(backdrop->priv->image_files);
+            if(num_items > 1) {
+                backdrop->priv->image_files = sort_image_list(backdrop->priv->image_files, num_items);
+            }
+        }
+    }
 }
 
 gboolean
@@ -1600,6 +1763,11 @@ xfce_backdrop_loader_closed_cb(GdkPixbufLoader *loader,
 
     image = gdk_pixbuf_loader_get_pixbuf(loader);
     if(image) {
+        /* If the image is supposed to be rotated, do that now */
+        GdkPixbuf *temp = gdk_pixbuf_apply_embedded_orientation (image);
+        /* Do not unref image, gdk_pixbuf_loader_get_pixbuf is transfer none */
+        image = temp;
+
         iw = gdk_pixbuf_get_width(image);
         ih = gdk_pixbuf_get_height(image);
     }
@@ -1742,6 +1910,11 @@ xfce_backdrop_loader_closed_cb(GdkPixbufLoader *loader,
         g_signal_emit(G_OBJECT(backdrop), backdrop_signals[BACKDROP_READY], 0);
     }
 
+    /* We either created image or took a ref with
+     * gdk_pixbuf_apply_embedded_orientation, free it here
+     */
+    if(image)
+        g_object_unref(image);
     backdrop->priv->image_data = NULL;
     xfce_backdrop_image_data_release(image_data);
     g_free(image_data);

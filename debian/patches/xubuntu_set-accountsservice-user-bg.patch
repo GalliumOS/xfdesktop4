@@ -2,6 +2,7 @@ Description: Update the Accountsservice user background
  accountsservice outside ubuntu doesn't have the wallpaper/background setting
 Author: Lionel Le Folgoc <mrpouit@ubuntu.com>
 Forwarded: not-needed
+Last-Update: 2015-05-13
 
 ---
  src/xfce-desktop.c |  104 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
@@ -17,7 +18,7 @@ Forwarded: not-needed
  
  #ifdef ENABLE_DESKTOP_ICONS
  #include "xfdesktop-icon-view.h"
-@@ -118,6 +119,8 @@ struct _XfceDesktopPriv
+@@ -119,6 +120,8 @@
      GtkWidget *icon_view;
      gdouble system_font_size;
  #endif
@@ -26,7 +27,7 @@ Forwarded: not-needed
  };
  
  enum
-@@ -359,11 +362,94 @@ create_bg_pixmap(GdkScreen *gscreen, gpo
+@@ -366,11 +369,94 @@
  }
  
  static void
@@ -121,7 +122,7 @@ Forwarded: not-needed
      GdkRectangle rect;
      GdkRegion *clip_region = NULL;
      gint i, monitor = -1, current_workspace;
-@@ -394,6 +480,20 @@ backdrop_changed_cb(XfceBackdrop *backdr
+@@ -401,6 +487,20 @@
      }
      if(monitor == -1)
          return;
@@ -142,7 +143,7 @@ Forwarded: not-needed
  
  #ifdef G_ENABLE_DEBUG
      monitor_name = gdk_screen_get_monitor_plug_name(gscreen, monitor);
-@@ -1422,7 +1522,9 @@ xfce_desktop_new(GdkScreen *gscreen,
+@@ -1448,7 +1548,9 @@
      desktop->priv->property_prefix = g_strdup(property_prefix);
  
      xfce_desktop_connect_settings(desktop);

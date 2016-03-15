@@ -80,7 +80,7 @@ INTLTOOL__v_MSGFMT_0 = @echo "  MSGFMT" $@;
 
 .po.pox:
 	$(MAKE) $(GETTEXT_PACKAGE).pot
-	$(MSGMERGE) $< $(GETTEXT_PACKAGE).pot -o $*.pox
+	$(MSGMERGE) $* $(GETTEXT_PACKAGE).pot -o $*.pox
 
 .po.mo:
 	$(INTLTOOL_V_MSGFMT)$(MSGFMT) -o $@ $<

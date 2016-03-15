@@ -1,3 +1,999 @@
+commit 9fb870a3451c829641d917679f26192385b0380e
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun Jun 28 08:18:26 2015 +0300
+
+    trivial: fix signed/unsigned comparison
+
+commit e222c6f0535113997a7f5d9cc7cc5062733a0aa1
+Author: Andreas Müller <schnitzeltony@googlemail.com>
+Date:   Thu Jun 25 13:08:29 2015 +0200
+
+    Remove whitespaces from monitor name when accessing settings
+    
+    Desktop wallpaper could not be set here. Running
+    'xfdesktop-settings --enable-debug' lead to:
+    
+    | Saving to /backdrop/screen0/monitorDISP3 BG - DI1/workspace0/last-image//usr/share/backgrounds/xfce/xfce-blue.jpg
+    
+    and no change was found tracking with Settings Editor.
+    
+    Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 3189f478664a97e0d908b14703ead6274b932267
+Author: Anonymous <noreply@xfce.org>
+Date:   Wed Jun 24 18:33:21 2015 +0200
+
+    I18n: Update translation lt (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 937971c1ec6a93d0abdf6742e6f501edb31b7d69
+Author: Manolo Díaz <diaz.manolo@gmail.com>
+Date:   Mon Jun 22 18:32:06 2015 +0200
+
+    I18n: Update translation es (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit c4be57fab72600f55d44a4ff5d277b76fdf9a4b8
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun Jun 21 18:12:52 2015 +0300
+
+    Settings: Fix loading of wallpaper previews (Bug #11892)
+    
+    Use an idle callback rather than threads for the wallpaper images.
+
+commit c2c53a7fc4a6ca11967d4226df38545642c33c66
+Author: Michael Findlay <keltoiboy@gmail.com>
+Date:   Thu Jun 11 12:32:45 2015 +0200
+
+    I18n: Update translation en_AU (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 9dcb530d18dd2d1874189f4275c0e82dac49f3d9
+Author: Anonymous <noreply@xfce.org>
+Date:   Wed Jun 10 00:32:23 2015 +0200
+
+    I18n: Update translation lt (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit b61ecc7205a9dbb8f33fc15b45dd82dbdd552bbb
+Author: Påvel Nicklasson <pavelnicklasson@bahnhof.se>
+Date:   Wed Jun 3 18:35:26 2015 +0200
+
+    I18n: Update translation sv (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 6559503a22d279fb5502f31f9bbb1a1b541bc343
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Mon May 25 07:51:16 2015 +0300
+
+    Rotate images for wallpaper
+    
+    If the image used for the wallpaper contains rotation information
+    embedded in it, go ahead and rotate the image so it looks better.
+
+commit f2647ce4fa523b24b68ce79ed9064db15ddf8832
+Author: Anonymous <noreply@xfce.org>
+Date:   Sat May 16 18:31:51 2015 +0200
+
+    I18n: Update translation lt (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit fa24c43f8f5a626396b3bea14d5510a0d24131ee
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun May 17 12:28:45 2015 +0300
+
+    Post release tag bump
+
+commit 6f0553c187fe95bb5ae502e94783c355cb519c39
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun May 17 12:25:20 2015 +0300
+
+    Updates for release.
+
+commit 298b8443b2e77b954072af46d30d2e7a6a40d697
+Author: Igor Kushnir <igorkuo@gmail.com>
+Date:   Wed May 13 20:58:04 2015 +0300
+
+    Optimized sorting wallpapers; added sorting test code.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 7443acbbe5c777b203adb06fec7464b9f3d341d1
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Mon May 11 17:41:03 2015 +0300
+
+    Don't sort the image list when randomly cycling (Bug #11817)
+    
+    When the Random Order option is selected and we're cycling the
+    background, don't bother sorting the image list since it's not
+    needed.
+
+commit ed2ebd9b3f22493a8b24e861f4c0541b80f71017
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Mon May 11 14:07:02 2015 +0300
+
+    Don't load an image list unless we're cycling (Bug #11817)
+    
+    There's no need to waste the CPU/memory keeping track of all the
+    images in a folder unless we're going to cycle over that list in
+    the future. This patch loads the list on demand as the wallpaper
+    cycling gets toggled.
+
+commit 2d9a8fb55a5d4fd7a87d372c4badcf76e65599d1
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Mon May 11 14:06:45 2015 +0300
+
+    trivial: fix signed/unsigned comparison warning
+
+commit 355ca9c23017c57f20af072a18250dfdf9a9bbf4
+Author: Igor Kushnir <igorkuo@meta.ua>
+Date:   Mon May 11 11:25:26 2015 +0300
+
+    Optimized loading wallpapers at start-up; optimized sorting icons in icon view.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 7be3fe65e810550fe35d3529bebcd7bd07e9af67
+Author: Ivica Kolić <ikoli@yahoo.com>
+Date:   Sun Apr 26 12:31:50 2015 +0200
+
+    I18n: Update translation hr (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 4f3d89cd9837e99761fd2533302c595826c78172
+Author: GenghisKhan <genghiskhan@gmx.ca>
+Date:   Fri Apr 24 18:32:02 2015 +0200
+
+    I18n: Update translation he (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 40362c1db63d24524cf59d73556e9f34c5a8ee04
+Author: Kiril Kirilov <cybercop_montana@abv.bg>
+Date:   Fri Apr 10 18:31:52 2015 +0200
+
+    I18n: Update translation bg (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 506bfcfc44fe7c176205b274f159d97379c1cf27
+Author: Anonymous <noreply@xfce.org>
+Date:   Thu Apr 9 00:33:10 2015 +0200
+
+    I18n: Update translation lt (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 4a259e3cdbf2267e83765cea73e21dacfa2744c6
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 17 22:38:48 2015 +0100
+
+    Allow dragging desktop launchers to the panel (Bug #2794)
+
+commit 3749863500630e6946cc6b4afbe0a5ae30d03c21
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Apr 2 16:17:50 2015 +0200
+
+    Load emblem-unreadable if necessary
+
+commit f2541ec3a528cdfdbaa33bf9b8fcc2048062c541
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Apr 2 11:17:24 2015 +0200
+
+    Fix crash (Bug #11782)
+    
+    Bail out when a negative value was calculated for row/col.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 8b90008c7c6f8334d92614564d64438d15477e41
+Author: Anonymous <noreply@xfce.org>
+Date:   Thu Apr 2 00:32:06 2015 +0200
+
+    I18n: Update translation lt (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 90cf57aa79de3e48a47c8c0485d53bc17d9a2960
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Wed Apr 1 20:10:36 2015 +0300
+
+    coverity cid 1292723 Uninitialized pointer read
+
+commit f7de9f04527a3ea87885403b17baaa60c88149cd
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Wed Apr 1 20:03:32 2015 +0300
+
+    fix coverit cid 1292722 Uninitialized pointer read
+
+commit ceb80ea317832d0e0e524af339fa32742dc20814
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Wed Apr 1 19:54:50 2015 +0300
+
+    coverity cid 1292724 Uninitialized pointer read
+
+commit 964471f19338ed0d362124bd78f04f06d3d2814d
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Wed Apr 1 19:53:21 2015 +0300
+
+    coverity cid 1292725 Dereference before null check
+
+commit 63f4b510d68f64cffadd018831689bb8d736c90e
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Wed Apr 1 12:27:01 2015 +0200
+
+    Hide empty comment line in icon tooltip
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 7c22f6d80150efc11bcbddf6bec7ce4a652d8bdc
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sun Mar 29 18:36:47 2015 +0200
+
+    Fix build error (Bug #11778)
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 6ec0392f0a9bc3a3c6dd7e85e0966fa36d5d1b59
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 24 15:22:48 2015 +0100
+
+    Ignore shadow blur radius when calculating icon text box
+    
+    This change normalizes the size of the icon text box.
+
+commit d76f5b34c0087969a12bf6fbb90ca2fa528f512d
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Fri Mar 20 15:40:08 2015 +0100
+
+    Code formatting
+
+commit 02aa86d01c2e5f4e7905215e461375d299c93ecb
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Mar 19 21:20:02 2015 +0100
+
+    Prefer "_NETSCAPE_URL" over "text/uri-list" (Bug #9632)
+    
+    Create a link instead of a copy after dragging the URL or media content
+    from a web browser window. Matches the behavior of Nautilus and Nemo.
+
+commit f82ad9ae3360a61cfe357a4b41a72212f0572e85
+Author: Olivier Duchateau <duchateau.olivier@gmail.com>
+Date:   Thu Mar 26 18:19:40 2015 +0000
+
+    backgrounds/ is default directory
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit fcf5d0b9ae13affb34425c9ac15109df7d65c3ef
+Author: Walter Cheuk <wwycheuk@gmail.com>
+Date:   Fri Mar 27 00:31:52 2015 +0100
+
+    I18n: Update translation zh_TW (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit e192a981137c68d01062ab2a5e300ce65fcc59d9
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Thu Mar 26 14:49:53 2015 +0300
+
+    Drop explicit LibSM check (Bug #11744)
+    
+    We get session management handling from libxfce4ui so let that
+    bring in the proper dependency.
+
+commit a5c389a72f5cf2de47965b40c7e65d0cb5d9b41d
+Author: Anonymous <noreply@xfce.org>
+Date:   Thu Mar 26 12:31:57 2015 +0100
+
+    I18n: Update translation lt (99%).
+    
+    220 translated messages, 2 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 377ec10a7bf6e64347cd84ec06dae7e9485e6fe0
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 17 11:47:29 2015 +0100
+
+    Some code formatting
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 351550a12c71e879982f1a2a71a4df53aec76005
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Fri Mar 13 17:04:00 2015 +0100
+
+    Preserve order when moving multiple icons (Bug #11195)
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 949e35f3446155088311db71f6ed90045a3dcec6
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sun Mar 1 23:42:52 2015 +0100
+
+    Drop warning when D-Bus timeout error occurs (Bug #11283)
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 1b5dcf65c0774e6dae815135e0a915716e39e93e
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Thu Mar 26 06:18:58 2015 +0300
+
+    trivial: fix build warnings
+
+commit dfd0e906ebcde15b1fed87cfb0c981a1d618ab70
+Author: Olivier Duchateau <duchateau.olivier@gmail.com>
+Date:   Wed Mar 25 16:21:56 2015 +0000
+
+    Don't hard code URI path in gtk_file_chooser_add_shortcut_folder_uri () function.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit ac4463cdba7f37ad1f6a2504906686c2aa5ff87e
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Wed Mar 18 00:04:42 2015 +0100
+
+    Add default wallpaper folder to file chooser (Bug #11715)
+
+commit e399f2cc774a10f05aff5fe2d2171d72bea586be
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Mon Mar 23 22:11:58 2015 +0100
+
+    Fix a regression
+    
+    This fixes a visual glitch caused by commit d8b37e5.
+
+commit c689577e2cda7443b74eccbc0ff9ba21374ba3c6
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 17 22:19:02 2015 +0100
+
+    Fix a previous commit
+    
+    This fixes commit 26bc8820e502f74b99648b213c28b681971e6ca6.
+
+commit f4872e6dca17bcd69bcd750833222c735ced7b58
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun Mar 22 10:14:23 2015 +0300
+
+    Post release tag bump
+
+commit 15a5f27e0d9ed2ee2c08f3f96f9388ba629b10e2
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun Mar 22 10:09:44 2015 +0300
+
+    Updates for release.
+
+commit 98102f05b931f60430e850ed977570cd113a2973
+Author: Matt Thirtytwo <matt.59491@gmail.com>
+Date:   Sat Mar 21 15:16:47 2015 +0100
+
+    Remove unused variable 'tmp_text'
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit e1829fa8da733da1f5f456b9500eafbc072cc4dd
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sun Mar 15 14:52:06 2015 +0300
+
+    Monitor the wallpaper file for changes (Bug #11620)
+    
+    Since Xfdesktop is already monitoring the wallpaper folder for
+    files being added and removed, have it also monitor and update
+    the current background when it is changed. This way user's custom
+    scripts can update the background without having to reload all the
+    desktop icons as well.
+
+commit d27729dba35d3df83d0ccde2fcf6017c87dcfe1e
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sat Mar 14 12:00:04 2015 +0100
+
+    Reinitialize background when reloading desktop (Bug #11620)
+
+commit 6ac5c343988e8df75c05c4f4c323b4472ff510da
+Author: Ivica  Kolić <ikoli@yahoo.com>
+Date:   Thu Mar 19 06:32:50 2015 +0100
+
+    I18n: Update translation hr (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 1ce2a0fcbc0f1e765a357b9e76c261dc6347ced6
+Author: Efstathios Iosifidis <iefstathios@gmail.com>
+Date:   Thu Mar 19 00:32:46 2015 +0100
+
+    I18n: Update translation el (76%).
+    
+    169 translated messages, 53 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 5304d6d0576c34b209d3e1fcb8dd71dbb3639ab1
+Author: Anonymous <noreply@xfce.org>
+Date:   Tue Mar 17 18:32:23 2015 +0100
+
+    I18n: Update translation lt (99%).
+    
+    220 translated messages, 2 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 49d712ae7310d94b6f66f01c1687d20ca56205dc
+Author: Anonymous <noreply@xfce.org>
+Date:   Tue Mar 17 00:32:48 2015 +0100
+
+    I18n: Update translation lt (91%).
+    
+    204 translated messages, 18 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 26bc8820e502f74b99648b213c28b681971e6ca6
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sat Mar 14 23:07:47 2015 +0100
+
+    Prevent invalid method calls on XfdesktopWindowIconManager
+    
+    XfdesktopWindowIconManager does not provide drag_data_get and
+    propose_drop_action.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 703e53b14fe51172154ab5d8cf3dbf8198bc40e6
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Fri Mar 13 18:25:50 2015 +0100
+
+    Update rc file after completing delete process (Bug #11692)
+    
+    Icon positions are now saved after the delete process was comfirmed
+    by the user and not when triggering the delete dialog.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 5dbe0e728ad0a8348cbf1687aea4b4aaf6a8c26e
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Fri Mar 13 00:15:20 2015 +0100
+
+    Add missing g_list_free()
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit d8b37e542326d174e3e806c999ec2066b1c7b644
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Mar 12 19:11:21 2015 +0100
+
+    Refactoring of code
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit fa2003998e5d42eb4370c671faa0d510c06a5dd5
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sun Mar 8 00:48:55 2015 +0100
+
+    Fix remaining icon text box glitches
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 57f33bd2082ff9ee84e9d6c644e20806b9583ab1
+Author: Matias De lellis <mati86dl@gmail.com>
+Date:   Sat Feb 14 11:26:26 2015 -0300
+
+    Add a xfconf settings to center the text on xfdesktop icons.
+    
+    This is enabled by default, but done optionally to fix RTL languages.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 081e5a7282fc82dc4ee16ad98fc98534c6cfab4e
+Author: Anonymous <noreply@xfce.org>
+Date:   Sat Mar 14 18:32:23 2015 +0100
+
+    I18n: Update translation lt (84%).
+    
+    188 translated messages, 34 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 2ed13d3cf8c2011ea4ab391f86ed540607db5e67
+Author: Anonymous <noreply@xfce.org>
+Date:   Sat Mar 14 12:31:55 2015 +0100
+
+    I18n: Update translation lt (83%).
+    
+    185 translated messages, 37 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 0d82bbf4661efab74820c56012175b186d176089
+Author: Nuno Miguel <nunomgue@gmail.com>
+Date:   Fri Mar 13 18:32:46 2015 +0100
+
+    I18n: Update translation pt (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 3b3e9ccfde645efb065970dabc96734b69c3fe52
+Author: Anonymous <noreply@xfce.org>
+Date:   Thu Mar 12 18:32:12 2015 +0100
+
+    I18n: Update translation lt (78%).
+    
+    175 translated messages, 47 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit b35f35c1cb8e8b7391956d2a096980095af5a15f
+Author: Anonymous <noreply@xfce.org>
+Date:   Thu Mar 12 00:32:46 2015 +0100
+
+    I18n: Update translation lt (64%).
+    
+    143 translated messages, 79 untranslated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 400ae97b70b62701aa5120185c6785994f66df7a
+Author: Natavan Mirzayeva <mirzayevanatavan@gmail.com>
+Date:   Wed Mar 11 00:32:00 2015 +0100
+
+    I18n: Update translation tr (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 0e4a8ee56be0b847acf7ae98e40167974f678e0c
+Author: Slavko <linux@slavino.sk>
+Date:   Sun Mar 8 18:32:33 2015 +0100
+
+    I18n: Update translation sk (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 9acad7353b6de8c7f8c3bbe435840e3866ab2dfa
+Author: Baurzhan Muftakhidinov <baurthefirst@gmail.com>
+Date:   Sun Mar 8 18:32:33 2015 +0100
+
+    I18n: Update translation kk (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 6f7a2d3b82e17b738a68d9b090d7bf0efedc5a0a
+Author: Masato HASHIMOTO <cabezon.hashimoto@gmail.com>
+Date:   Sun Mar 8 18:32:33 2015 +0100
+
+    I18n: Update translation ja (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit adbcd242515e38d198b01a11763a012c02cfaab9
+Author: Michal Várady <miko.vaji@gmail.com>
+Date:   Sun Mar 8 18:32:33 2015 +0100
+
+    I18n: Update translation cs (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 274b8febb16dc9cd16e4d605437fbc5edde5d76c
+Author: Sergey Alyoshin <alyoshin.s@gmail.com>
+Date:   Sun Mar 8 00:32:07 2015 +0100
+
+    I18n: Update translation ru (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 42fb1de655784e3f4d61d3a13400b9c0e4d0e540
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Mar 5 12:40:01 2015 +0100
+
+    windowlist: Reduce right padding
+
+commit 2ad16b8efe9b576b998e442a3c01b9d7c3a91fbb
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sat Mar 7 00:37:49 2015 +0100
+
+    Do not overwrite rc file while restoring icons (bug #11266)
+
+commit d53058d36fb292223b5dd3aae39c89db9465b6b3
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sat Mar 7 20:32:26 2015 +0300
+
+    windowlist: Consider RTL languages
+
+commit 508a1b57c1353b9c9e1dd3122692e3789f00cc0c
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Mar 5 12:13:26 2015 +0100
+
+    Fix crash when moving 2+ icons to the bottom right corner
+
+commit 70c0ba765f6b21c7cb1a9e1e16b4144795f7c70f
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Mar 5 11:08:50 2015 +0100
+
+    Fix icon placement when using "Arrange Desktop Icons" (Bug #11639)
+    
+    Additional cosmetic fix:
+      Sort volume icons after special ones
+
+commit d9a8dd5b6aed2a2cca3ac7131bb4478d07afd595
+Author: Yarema aka Knedlyk <yupadmin@gmail.com>
+Date:   Sat Mar 7 00:32:17 2015 +0100
+
+    I18n: Update translation uk (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 147c1d86a2a53ae6c8e6fd481d46c134a7075ae5
+Author: abuyop <abuyop@gmail.com>
+Date:   Fri Mar 6 12:32:06 2015 +0100
+
+    I18n: Update translation ms (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 2cf3af73a2a40cb17845154d2b70b44e40f599f4
+Author: 玉堂白鹤 <yjwork@qq.com>
+Date:   Fri Mar 6 06:31:59 2015 +0100
+
+    I18n: Update translation zh_CN (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 928c2fc3a85792a2d585f91d79db8507711eb7d2
+Author: Harald <haarektrans@gmail.com>
+Date:   Thu Mar 5 18:32:10 2015 +0100
+
+    I18n: Update translation nb (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit b6d752ceaef76dd2dc61c08c623b54d2a81c497f
+Author: Cristian Marchi <cri.penta@gmail.com>
+Date:   Thu Mar 5 18:32:10 2015 +0100
+
+    I18n: Update translation it (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 1c943b75b5c5c154fa52bded213a29107efe846c
+Author: Theppitak Karoonboonyanan <theppitak@gmail.com>
+Date:   Thu Mar 5 12:33:16 2015 +0100
+
+    I18n: Update translation th (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 111bba13ffa1a496f311edc3d9be369e0454ecd1
+Author: Piotr Strębski <strebski@o2.pl>
+Date:   Thu Mar 5 12:33:16 2015 +0100
+
+    I18n: Update translation pl (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 91e440addc223ccc182dbb6a1a9e7572535f2f8f
+Author: André Miranda <andreldm1989@gmail.com>
+Date:   Thu Mar 5 00:32:24 2015 +0100
+
+    I18n: Update translation pt_BR (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit f0a9b29a68eb056944dd9dba4530de0ebc22d70e
+Author: gabrieltandil <gabriel.tandil@gmail.com>
+Date:   Wed Mar 4 18:31:54 2015 +0100
+
+    I18n: Update translation es (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit e216e003fd0bc2eec1f8afd62cb2f02250294a68
+Author: Seong-ho Cho <darkcircle.0426@gmail.com>
+Date:   Wed Mar 4 06:31:52 2015 +0100
+
+    I18n: Update translation ko (100%).
+    
+    222 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit d122e28567eae18e6328ec17f297ddab6ce87ec0
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 3 17:35:14 2015 +0100
+
+    Fix glib warning
+    
+    The following warning would appear when starting xfdesktop with icon
+    type set to "minimized application icons":
+      signal 'hidden-state-changed' is invalid for instance '0x99c0340'
+      of type 'XfdesktopWindowIconManager'
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit cfb4447ece472e0dad606fe7e686d95c6a03ea01
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Tue Mar 3 20:10:33 2015 +0300
+
+    trivial: remove unused variable
+
+commit 731f6c95dd36cfb505c030c91e0fe6044be17735
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 3 16:01:26 2015 +0100
+
+    Fix invalid g_source_remove() call
+    
+    If the timeout already expired, then the following error would occur:
+      GLib-CRITICAL **: Source ID 123 was not found when attempting to
+      remove it
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 488f11607c7a73d543986832fdfac8cc198798cb
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Mar 3 01:09:08 2015 +0100
+
+    Fix another warning
+    
+    instance of invalid non-instantiatable type 'XfdesktopFileIconManager'
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 7f39f313895f4678f06f24519eab5486371f9360
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Mon Mar 2 22:06:27 2015 +0100
+
+    Center icons vertically in the grid (Bug #11086)
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit a8cd502d4a2c445793de9abcda66651e11aa9f27
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Mon Mar 2 20:06:38 2015 +0100
+
+    Cleanup some tabs
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 738005a36fa9a76b9f8787404fb3d36962537aa8
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sun Mar 1 12:18:41 2015 +0100
+
+    Set initial value of font size spin button
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 95fd806ca26129bcdd497fbcfdb2c937f2b0a1f3
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Fri Feb 27 19:05:20 2015 +0100
+
+    Add 'Paste Into Folder' context menu entry
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit f1498fa0d7670190d754c4ba39286f525d3a637d
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sat Feb 28 19:20:52 2015 +0100
+
+    Properly count and limit amount of template files
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 3317d343085f0d796532e8641e6ce3a0cdd89d38
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Feb 26 22:35:02 2015 +0100
+
+    Show sub directories in template menu
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 1cf3a422ac21ac5e408f967d5424af9be914488f
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Feb 26 00:27:09 2015 +0100
+
+    Prevent accidental double clicks in single click mode (Bug #10720)
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 0a0a6e81e5404798fb1fac68f6c8d7f32df13854
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Wed Feb 25 12:53:12 2015 +0100
+
+    Various mouse click behavior fixes
+    
+    Unselect a selected icon on button release while <Control> is pressed.
+    This fixes a problem which is triggered by dragging a selected icon.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 64ef0f646c2b8c310828bbd33400305fe4bb63e2
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Feb 19 23:30:13 2015 +0100
+
+    Disable rename menu entry for special icons
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit f89d6a697bd216349d306e16fb82924e058f2e89
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Thu Feb 19 22:43:27 2015 +0100
+
+    Detect special icons in multiple selection
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 2b4c627b4677b2bd7801996a9752ab508cc00038
+Author: abuyop <abuyop@gmail.com>
+Date:   Tue Mar 3 00:32:12 2015 +0100
+
+    I18n: Update translation ms (100%).
+    
+    221 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 3179cf1a2e4329a84cffbf5b298ab722a937e52a
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Mon Mar 2 16:24:41 2015 +0300
+
+    trivial: Fix compiler warning
+    
+    We must return a value from the function.
+
+commit da08d4781e4cd82e100dbc155569360d11dc09ac
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Wed Feb 25 13:32:24 2015 +0100
+
+    Do not set GtkDialog:has-separator which is deprecated
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 194963ee14286649e6922d3a8f08c62f5c1853e7
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Feb 24 21:53:38 2015 +0100
+
+    Fix warning 'instance of invalid non-instantiatable type'
+    
+    With this commit 'metadata file changed' events should be processed
+    properly now.
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 7cb63ca27a5792a41229758dfa59c36285a769d0
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Feb 24 18:57:50 2015 +0100
+
+    Add icon emblems in clockwise order
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit d98a8fddf4a0a875ea4843bcff5f69b9f6254c53
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Tue Feb 24 18:44:52 2015 +0100
+
+    Handle icons with preset emblems (Bug #7417)
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 7cfdcad6490b635aaa98a6807eed2b7aec1f529d
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sun Feb 22 19:49:12 2015 +0100
+
+    Enable drag&drop popup menu for local actions
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit bd7273f2a251d5225ddb3753c7c79206fe317b5f
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Sat Feb 21 21:48:28 2015 +0100
+
+    Properly check if mouse button 3 is pressed
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 9e2689ae31aa999b5acaa5b627e3165dc59f230f
+Author: Thaddaeus Tintenfisch <thad.fisch@gmail.com>
+Date:   Fri Feb 20 01:02:01 2015 +0100
+
+    Use mini icon and allow dimming of non-scaled icons
+    
+    Signed-off-by: Eric Koegel <eric.koegel@gmail.com>
+
+commit 1822b716fcd8363ee3b041ac2e5be0de0b531032
+Author: Seong-ho Cho <darkcircle.0426@gmail.com>
+Date:   Mon Mar 2 12:32:23 2015 +0100
+
+    I18n: Update translation ko (100%).
+    
+    221 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 03bf00aba956cd018849d31e0415d3a9f84d40f4
+Author: Sergey Alyoshin <alyoshin.s@gmail.com>
+Date:   Sun Mar 1 00:32:00 2015 +0100
+
+    I18n: Update translation ru (100%).
+    
+    221 translated messages.
+    
+    Transifex (https://www.transifex.com/projects/p/xfce/).
+
+commit 21186d3d17735e6165e153ddf898842407bbda41
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sat Feb 28 19:36:31 2015 +0300
+
+    Post release tag bump
+
+commit fc66880eff6da471c7554e799e8d38a1d88ef220
+Author: Eric Koegel <eric.koegel@gmail.com>
+Date:   Sat Feb 28 19:33:47 2015 +0300
+
+    Updates for release.
+
 commit 7e2f753ef63da1ba6a7db9e46aacd38175186070
 Author: Mișu Moldovan <dumol@l10n.ro>
 Date:   Sat Feb 28 12:32:00 2015 +0100

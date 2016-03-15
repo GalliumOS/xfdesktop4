@@ -13,7 +13,7 @@ override_dh_install:
 	# why oh why is this necessary?
 	rm -rf $(CURDIR)/debian/xfdesktop4-data/usr/share/man
 
-override_dh_link:
+override_dh_link-arch:
 	rm -rf $(CURDIR)/debian/xfdesktop4/usr/share/doc/xfdesktop4
 	ln -s xfdesktop4-data $(CURDIR)/debian/xfdesktop4/usr/share/doc/xfdesktop4
 	dh_link

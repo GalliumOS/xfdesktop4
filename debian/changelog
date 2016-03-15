@@ -1,14 +1,80 @@
-xfdesktop4 (4.12.0-1ubuntu1-galliumos2) vivid; urgency=medium
+xfdesktop4 (4.12.3-2ubuntu1-galliumos1) xenial; urgency=low
 
-  * Changed default wall to /usr/share/xfce4/backdrops/galliumos-wall2.jpg
+  * Added GalliumOS patch
 
- -- Hugh Greenberg <hugh@galiumos.org>  Mon, 8 Feb 2016 22:08:51 -0400
+ -- Hugh Greenberg <hugh@galliumos.org>  Mon, 14 Mar 2016 06:33:09 +1100
 
-xfdesktop4 (4.12.0-1ubuntu1-galliumos1) vivid; urgency=medium
+xfdesktop4 (4.12.3-2ubuntu1) xenial; urgency=low
 
-  * Set default wallpaper to a galliumos wall
+  * Merge from Debian unstable. (LP: #1524474) Remaining changes:
+    - debian/patches/xubuntu_improve-nautilus-interactions.patch: added,
+      should prevent nautilus from taking over the desktop if xfdesktop is
+      running (and vice-versa).
+    - debian/patches/xubuntu_set-accountsservice-user-bg.patch: update the
+      user background property of Accountsservice on backdrop change.
 
- -- Hugh Greenberg <hugh@galiumos.org>  Wed, 16 Dec 2015 22:08:51 -0400
+ -- Jackson Doak <noskcaj@ubuntu.com>  Thu, 10 Dec 2015 06:33:09 +1100
+
+xfdesktop4 (4.12.3-2) unstable; urgency=medium
+
+  * debian/rules:
+    - only symlink /u/s/d/xfdesktop4 to xfdesktop4-data when
+    building arch-dep packages.                                 closes: #806124
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 24 Nov 2015 22:56:13 +0100
+
+xfdesktop4 (4.12.3-1) unstable; urgency=medium
+
+  * New upstream bugfix release.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 19 Sep 2015 15:45:40 +0200
+
+xfdesktop4 (4.12.3-0ubuntu1) wily; urgency=medium
+
+  * New upstream bugfix release.
+
+ -- Unit 193 <unit193@ubuntu.com>  Sat, 05 Sep 2015 07:11:00 -0400
+
+xfdesktop4 (4.12.2-1ubuntu1) wily; urgency=low
+
+  * Merge from Debian unstable.  Remaining changes:
+    - debian/patches/xubuntu_improve-nautilus-interactions.patch: added,
+      should prevent nautilus from taking over the desktop if xfdesktop is
+      running (and vice-versa).
+    - debian/patches/xubuntu_set-accountsservice-user-bg.patch: update the
+      user background property of Accountsservice on backdrop change.
+
+ -- Sean Davis <smd.seandavis@gmail.com>  Mon, 25 May 2015 16:16:56 -0400
+
+xfdesktop4 (4.12.2-1) unstable; urgency=medium
+
+  * debian/xfdesktop4.postinst dropped, 4.4.2 migration is long gone.
+  * New upstream release.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sun, 17 May 2015 14:59:25 +0200
+
+xfdesktop4 (4.12.1-2ubuntu1) wily; urgency=low
+
+  * Merge from Debian unstable.  Remaining changes:
+    - debian/patches/xubuntu_improve-nautilus-interactions.patch: added,
+      should prevent nautilus from taking over the desktop if xfdesktop is
+      running (and vice-versa).
+    - debian/patches/xubuntu_set-accountsservice-user-bg.patch: update the
+      user background property of Accountsservice on backdrop change.
+
+ -- Sean Davis <smd.seandavis@gmail.com>  Wed, 13 May 2015 19:47:09 -0400
+
+xfdesktop4 (4.12.1-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Wed, 06 May 2015 17:30:17 +0200
+
+xfdesktop4 (4.12.1-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sun, 22 Mar 2015 15:27:01 +0100
 
 xfdesktop4 (4.12.0-1ubuntu1) vivid; urgency=medium
 

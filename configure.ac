@@ -11,9 +11,9 @@ dnl
 dnl version info
 m4_define([xfdesktop_version_major], [4])
 m4_define([xfdesktop_version_minor], [12])
-m4_define([xfdesktop_version_micro], [0])
+m4_define([xfdesktop_version_micro], [3])
 m4_define([xfdesktop_version_nano], [])
-m4_define([xfdesktop_version_build], [7e2f753])
+m4_define([xfdesktop_version_build], [9fb870a])
 m4_define([xfdesktop_version_tag],[])
 m4_define([xfdesktop_version], [xfdesktop_version_major().xfdesktop_version_minor().xfdesktop_version_micro()ifelse(xfdesktop_version_nano(), [], [], [.xfdesktop_version_nano()])ifelse(xfdesktop_version_tag(), [git], [xfdesktop_version_tag()-xfdesktop_version_build()], [xfdesktop_version_tag()])])
 
@@ -78,7 +78,6 @@ XDT_I18N([am ar ast be bg bn ca cs da de el en_AU en_GB eo es et eu fa_IR fi fr 
 
 dnl Check for X11 installed
 XDT_CHECK_LIBX11_REQUIRE
-XDT_CHECK_LIBSM
 
 dnl Check for dbus-binding-tool
 AC_ARG_VAR([DBUS_BINDING_TOOL], [Tool to generate C bindings from XML D-Bus interface definitions])
