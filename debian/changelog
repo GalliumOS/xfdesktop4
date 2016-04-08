@@ -1,3 +1,9 @@
+xfdesktop4 (4.12.3-2ubuntu1-galliumos2) xenial; urgency=low
+
+  * Fixed GalliumOS default wall patch
+
+ -- Hugh Greenberg <hugh@galliumos.org>  Mon, 07 Apr 2016 06:33:09 +1100
+
 xfdesktop4 (4.12.3-2ubuntu1-galliumos1) xenial; urgency=low
 
   * Added GalliumOS patch
