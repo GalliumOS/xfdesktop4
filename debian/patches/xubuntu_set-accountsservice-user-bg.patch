@@ -1,0 +1,156 @@
+Description: Update the Accountsservice user background
+ accountsservice outside ubuntu doesn't have the wallpaper/background setting
+Author: Lionel Le Folgoc <mrpouit@ubuntu.com>
+Forwarded: not-needed
+Last-Update: 2015-05-13
+
+---
+ src/xfce-desktop.c |  104 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 103 insertions(+), 1 deletion(-)
+
+--- a/src/xfce-desktop.c
++++ b/src/xfce-desktop.c
+@@ -63,6 +63,7 @@
+ #include <glib.h>
+ #include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
++#include <gio/gio.h>
+ 
+ #ifdef ENABLE_DESKTOP_ICONS
+ #include "xfdesktop-icon-view.h"
+@@ -119,6 +120,8 @@
+     GtkWidget *icon_view;
+     gdouble system_font_size;
+ #endif
++
++    gchar *last_filename;
+ };
+ 
+ enum
+@@ -366,11 +369,94 @@
+ }
+ 
+ static void
++set_accountsservice_user_bg(const gchar *filename)
++{
++    GDBusProxy *proxy = NULL;
++    GDBusProxy *user = NULL;
++    GVariant *variant = NULL;
++    GError *error = NULL;
++    gchar *object_path = NULL;
++    const gchar *user_name = g_get_user_name();
++
++    proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
++                                          G_DBUS_PROXY_FLAGS_NONE,
++                                          NULL,
++                                          "org.freedesktop.Accounts",
++                                          "/org/freedesktop/Accounts",
++                                          "org.freedesktop.Accounts",
++                                          NULL,
++                                          &error);
++
++    if(!proxy) {
++        DBG("Failed to contact accounts service: %s", error->message);
++        g_error_free(error);
++        return;
++    }
++
++    variant = g_dbus_proxy_call_sync(proxy,
++                                     "FindUserByName",
++                                     g_variant_new("(s)", user_name),
++                                     G_DBUS_CALL_FLAGS_NONE,
++                                     -1,
++                                     NULL,
++                                     &error);
++
++    if(!variant) {
++        DBG("Could not contact accounts service to look up '%s': %s",
++            user_name, error->message);
++        g_error_free(error);
++        goto bail;
++    }
++
++    g_variant_get(variant, "(o)", &object_path);
++    user = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
++                                         G_DBUS_PROXY_FLAGS_NONE,
++                                         NULL,
++                                         "org.freedesktop.Accounts",
++                                         object_path,
++                                         "org.freedesktop.Accounts.User",
++                                         NULL,
++                                         &error);
++    g_free(object_path);
++
++    if(!user) {
++        DBG("Could not create proxy for user '%s': %s",
++            g_variant_get_string(variant, NULL), error->message);
++        g_error_free(error);
++        goto bail;
++    }
++    g_variant_unref(variant);
++
++    variant = g_dbus_proxy_call_sync(user,
++                                     "SetBackgroundFile",
++                                     g_variant_new("(s)", filename),
++                                     G_DBUS_CALL_FLAGS_NONE,
++                                     -1,
++                                     NULL,
++                                     &error);
++
++    if(!variant) {
++        DBG("Failed to set the background '%s': %s", filename, error->message);
++        g_error_free(error);
++        goto bail;
++    }
++
++bail:
++    if(user)
++        g_object_unref(user);
++    if(proxy)
++        g_object_unref(proxy);
++    if(variant)
++        g_variant_unref(variant);
++}
++
++static void
+ backdrop_changed_cb(XfceBackdrop *backdrop, gpointer user_data)
+ {
+     XfceDesktop *desktop = XFCE_DESKTOP(user_data);
+     GdkPixmap *pmap = desktop->priv->bg_pixmap;
+     GdkScreen *gscreen = desktop->priv->gscreen;
++    gchar *new_filename = NULL;
+     GdkRectangle rect;
+     GdkRegion *clip_region = NULL;
+     gint i, monitor = -1, current_workspace;
+@@ -401,6 +487,20 @@
+     }
+     if(monitor == -1)
+         return;
++    /* notify Accountsservice of the new bg (only for monitor0) */
++    if(monitor == 0)
++    {
++        if (xfce_desktop_get_current_workspace(desktop) == 0)
++        {
++            new_filename = g_strdup(xfce_backdrop_get_image_filename(backdrop));
++            if (g_strcmp0(desktop->priv->last_filename, new_filename) != 0)
++            {
++                desktop->priv->last_filename = g_strdup(new_filename);
++                set_accountsservice_user_bg(xfce_backdrop_get_image_filename(backdrop));
++            }
++            g_free(new_filename);
++        }
++    }
+ 
+ #ifdef G_ENABLE_DEBUG
+     monitor_name = gdk_screen_get_monitor_plug_name(gscreen, monitor);
+@@ -1448,7 +1548,9 @@
+     desktop->priv->property_prefix = g_strdup(property_prefix);
+ 
+     xfce_desktop_connect_settings(desktop);
+-    
++
++    desktop->priv->last_filename = g_strdup("");
++
+     return GTK_WIDGET(desktop);
+ }
+ 

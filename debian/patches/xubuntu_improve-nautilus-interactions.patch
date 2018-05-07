@@ -1,0 +1,57 @@
+Description: Get/set _NET_DESKTOP_MANAGER_S<screen> atom
+ This atom is used by at least nautilus, so don't start xfdesktop
+ if it is set already. If it isn't, try to set it in order to
+ prevent a later call to nautilus to override the desktop.
+ .
+ Not forwardable, because it's a hack/test for the current xubuntu
+ development release. I don't know how it will affect other GNOME apps.
+ I'll reevaluate its correctness/usefulness before the precise release,
+ and decide whether to disable or forward it at that time.
+Author: Lionel Le Folgoc <mrpouit@ubuntu.com>
+Forwarded: not-needed
+Last-Update: 2015-05-13
+
+---
+ src/xfce-desktop.c |   15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+--- a/src/xfce-desktop.c
++++ b/src/xfce-desktop.c
+@@ -834,8 +834,8 @@
+ {
+     Window xwin;
+     gint xscreen;
+-    gchar selection_name[100];
+-    Atom selection_atom, manager_atom;
++    gchar selection_name[100], common_selection_name[32];
++    Atom selection_atom, common_selection_atom, manager_atom;
+     
+     xwin = GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(desktop)));
+     xscreen = gdk_screen_get_number(desktop->priv->gscreen);
+@@ -844,6 +844,9 @@
+     selection_atom = XInternAtom(gdk_x11_get_default_xdisplay(), selection_name, False);
+     manager_atom = XInternAtom(gdk_x11_get_default_xdisplay(), "MANAGER", False);
+ 
++    g_snprintf(common_selection_name, 32, "_NET_DESKTOP_MANAGER_S%d", xscreen);
++    common_selection_atom = XInternAtom(gdk_x11_get_default_xdisplay(), common_selection_name, False);
++
+     /* the previous check in src/main.c occurs too early, so workaround by
+      * adding this one. */
+    if(XGetSelectionOwner(gdk_x11_get_default_xdisplay(), selection_atom) != None) {
+@@ -851,8 +854,16 @@
+        exit(0);
+    }
+ 
++    /* Check that _NET_DESKTOP_MANAGER_S%d isn't set, as it means another
++     * desktop manager is running, e.g. nautilus */
++    if(XGetSelectionOwner (gdk_x11_get_default_xdisplay(), common_selection_atom) != None) {
++        g_warning("%s: another desktop manager is running.", PACKAGE);
++        exit(1);
++    }
++
+     XSelectInput(gdk_x11_get_default_xdisplay(), xwin, PropertyChangeMask | ButtonPressMask);
+     XSetSelectionOwner(gdk_x11_get_default_xdisplay(), selection_atom, xwin, GDK_CURRENT_TIME);
++    XSetSelectionOwner(gdk_x11_get_default_xdisplay(), common_selection_atom, xwin, GDK_CURRENT_TIME);
+ 
+     /* Check to see if we managed to claim the selection. If not,
+      * we treat it as if we got it then immediately lost it */
