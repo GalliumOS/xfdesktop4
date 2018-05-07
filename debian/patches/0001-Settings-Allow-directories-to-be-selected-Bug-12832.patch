@@ -1,0 +1,28 @@
+From 726b34c0b37e778a4983866602cc20cfa4172b99 Mon Sep 17 00:00:00 2001
+From: Eric Koegel <eric.koegel@gmail.com>
+Date: Mon, 13 Jun 2016 15:08:11 +0300
+Subject: [PATCH] Settings: Allow directories to be selected (Bug #12832)
+
+Gtk 2.24.31 imported some Gtk3 code that breaks directory
+selection when using a file filter while in directory mode.
+We need to add directories to the filter for the
+GtkFileChooser, otherwise you can't select directories
+while in directory mode...
+Cherry-picked from:
+https://git.xfce.org/users/eric/xfdesktop/commit/?h=the-long-road-to-gtk3&id=cc311b61b82b7510a3a6cb0952d3a331e3551e05
+---
+ settings/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/settings/main.c
++++ b/settings/main.c
+@@ -1857,6 +1857,9 @@
+     filter = gtk_file_filter_new();
+     gtk_file_filter_set_name(filter, _("Image files"));
+     gtk_file_filter_add_pixbuf_formats(filter);
++    gtk_file_filter_add_mime_type(filter, "inode/directory");
++    gtk_file_filter_add_mime_type(filter, "application/x-directory");
++    gtk_file_filter_add_mime_type(filter, "text/directory");
+     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(panel->btn_folder), filter);
+ 
+     /* Get default wallpaper folder */

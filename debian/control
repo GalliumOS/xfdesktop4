@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 9), libglib2.0-dev, libgtk2.0-dev,
  libxfconf-0-dev (>= 4.10.0), intltool, libdbus-glib-1-dev (>= 0.84),
  libthunarx-2-dev (>= 1.4.0), libexo-1-dev (>= 0.7.0), 
  libgarcon-1-0-dev (>= 0.2.0), libnotify-dev (>= 0.4.0), dpkg-dev (>= 1.16.1)
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Homepage: http://www.xfce.org/
 Vcs-Svn: svn://anonscm.debian.org/pkg-xfce/desktop/trunk/xfdesktop4/
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-xfce/desktop/trunk/xfdesktop4/
@@ -28,7 +28,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, xfdesktop4-data (= ${source:Version}),
  exo-utils
 Replaces: xfdesktop4-data (<< 4.5.92)
-Recommends: dbus-x11, librsvg2-common, xdg-user-dirs, tumbler
+Recommends: default-dbus-session-bus | dbus-session-bus, librsvg2-common, xdg-user-dirs, tumbler
 Suggests: menu
 Description: xfce desktop background, icons and root menu manager
  xfdesktop4 sets the background image, provides a right-click menu to
@@ -36,12 +36,3 @@ Description: xfce desktop background, icons and root menu manager
  launchers) or iconified windows. It includes gradient support for
  background color, saturation support for background image, real multiscreen
  and xinerama support.
-
-Package: xfdesktop4-dbg
-Section: debug
-Architecture: any
-Priority: extra
-Depends: ${shlibs:Depends}, ${misc:Depends}, xfdesktop4 (= ${binary:Version})
-Description: debugging information for xfdesktop4
- This package contains debugging symbols for xfdesktop4, the desktop manager
- for Xfce 4 Desktop Environment.

@@ -1,3 +1,61 @@
+xfdesktop4 (4.12.3-4ubuntu2-galliumos0) bismuth; urgency=medium
+
+  * Prepare for GalliumOS 3.0
+    - patches from 4.12.3-2ubuntu1-galliumos2
+
+ -- reynhout <reynhout@galliumos.org>  Mon, 07 May 2018 04:29:16 +0000
+
+xfdesktop4 (4.12.3-4ubuntu2) bionic; urgency=medium
+
+  * d/p/0001-Settings-Allow-directories-to-be-selected-Bug-12832.patch:
+    - Refreshed
+  * d/p/xubuntu_set-accountsservice-user-bg.patch:
+    - Updated to support new AccountsService method of setting 
+      background file
+
+ -- Sean Davis <smd.seandavis@gmail.com>  Sat, 17 Feb 2018 09:32:46 -0500
+
+xfdesktop4 (4.12.3-4ubuntu1) devel; urgency=medium
+
+  * Merge from Debian unstable. Remaining changes:
+    - debian/patches/xubuntu_improve-nautilus-interactions.patch: added,
+      should prevent nautilus from taking over the desktop if xfdesktop is
+      running (and vice-versa).
+    - debian/patches/xubuntu_set-accountsservice-user-bg.patch: update the
+      user background property of Accountsservice on backdrop change.
+
+ -- Unit 193 <unit193@ubuntu.com>  Sat, 29 Apr 2017 14:00:17 -0400
+
+xfdesktop4 (4.12.3-4) unstable; urgency=medium
+
+  * debian/patches
+    - 0001-Settings-Allow-directories-to-be-selected-Bug-12832 fix regression
+    with Gtk 2.24.31+ which preventing directories to be selected in
+    wallpapers settings.                                        closes: #849823
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 18 Feb 2017 14:24:28 +0100
+
+xfdesktop4 (4.12.3-3) unstable; urgency=medium
+
+  * debian/control:
+    - update dbus-x11 recommends to default-dbus-session-bus |
+      dbus-session-bus.                                         closes: #836031
+    - update standards version to 3.9.8.
+    - drop xfdesktop4-dbg package.
+  * debian/rules:
+    - migrate to dbgsym package.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 30 Aug 2016 22:52:48 +0200
+
+xfdesktop4 (4.12.3-2ubuntu2) devel; urgency=medium
+
+  * d/p/01_Allow-directories-to-be-selected.patch: Add upstream patch.
+    - Desktop settings: Allow directories to be selected. This fixes a bug
+      where one could only select images, and not browse directories when
+      selecting the background image.
+
+ -- Unit 193 <unit193@ubuntu.com>  Wed, 15 Feb 2017 17:44:58 -0500
+
 xfdesktop4 (4.12.3-2ubuntu1-galliumos2) xenial; urgency=low
 
   * Fixed GalliumOS default wall patch
