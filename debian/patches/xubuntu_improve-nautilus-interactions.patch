@@ -17,7 +17,7 @@ Last-Update: 2015-05-13
 
 --- a/src/xfce-desktop.c
 +++ b/src/xfce-desktop.c
-@@ -834,8 +834,8 @@
+@@ -833,8 +833,8 @@
  {
      Window xwin;
      gint xscreen;
@@ -28,7 +28,7 @@ Last-Update: 2015-05-13
      
      xwin = GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(desktop)));
      xscreen = gdk_screen_get_number(desktop->priv->gscreen);
-@@ -844,6 +844,9 @@
+@@ -843,6 +843,9 @@
      selection_atom = XInternAtom(gdk_x11_get_default_xdisplay(), selection_name, False);
      manager_atom = XInternAtom(gdk_x11_get_default_xdisplay(), "MANAGER", False);
  
@@ -38,7 +38,7 @@ Last-Update: 2015-05-13
      /* the previous check in src/main.c occurs too early, so workaround by
       * adding this one. */
     if(XGetSelectionOwner(gdk_x11_get_default_xdisplay(), selection_atom) != None) {
-@@ -851,8 +854,16 @@
+@@ -850,8 +853,16 @@
         exit(0);
     }
  

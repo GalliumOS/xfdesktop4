@@ -19,7 +19,7 @@ override_dh_link-arch:
 	dh_link
 
 override_dh_strip:
-	dh_strip --dbg-package=xfdesktop4-dbg
+	dh_strip --dbgsym-migration='xfdesktop4-dbg (<< 4.12.3-3~)'
 
 %:
 	dh $@ --parallel
