@@ -1,7 +1,8 @@
-xfdesktop4 (4.12.3-4ubuntu2-galliumos0) bismuth; urgency=medium
+xfdesktop4 (4.12.3-4ubuntu2-galliumos0+dev1) bismuth; urgency=medium
 
   * Prepare for GalliumOS 3.0
     - patches from 4.12.3-2ubuntu1-galliumos2
+  * Update default backdrop path
 
  -- reynhout <reynhout@galliumos.org>  Mon, 07 May 2018 04:29:16 +0000
 
