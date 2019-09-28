@@ -934,7 +934,7 @@ msgstr "Hay datos que deben ser escritos en el dispositivo «%s» antes de que p
 
 #: ../src/xfdesktop-notify.c:221
 msgid "Unmount Finished"
-msgstr "Desmontaje sin terminar"
+msgstr "Desmontaje terminado"
 
 #: ../src/xfdesktop-notify.c:223 ../src/xfdesktop-notify.c:408
 #, c-format
